@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>College Notice Summarizer</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        :root{
+            --teal-50:#f0fdfa; --teal-100:#ccfbf1; --teal-200:#99f6e4; --teal-300:#5eead4; --teal-400:#2dd4bf; --teal-500:#14b8a6; --teal-600:#0d9488; --teal-700:#0f766e; --teal-800:#115e59; --teal-900:#134e4a;
+            --lavender-50:#faf5ff; --lavender-100:#f3e8ff; --lavender-200:#e9d5ff; --lavender-300:#d8b4fe; --lavender-400:#c084fc; --lavender-500:#a855f7; --lavender-600:#9333ea; --lavender-700:#7c3aed; --lavender-800:#6b21a8; --lavender-900:#581c87;
+            --black:#1a1a1a; --gray-50:#f9fafb; --gray-100:#f3f4f6; --gray-200:#e5e7eb; --gray-300:#d1d5db; --gray-400:#9ca3af; --gray-500:#6b7280; --gray-600:#4b5563; --gray-700:#374151; --gray-800:#1f2937; --gray-900:#111827;
+        }
+        html,body{background:var(--gray-50); color:var(--black); font-family:'Inter', -apple-system, BlinkMacSystemFont, sans-serif;} 
+        .navbar{background:white; border-bottom:2px solid var(--teal-200); box-shadow:0 1px 3px rgba(0,0,0,0.1);} 
+        .brand{font-weight:700; letter-spacing:-0.025em; color:var(--black); font-size:1.25rem;} 
+        .card{background:white; border:1px solid var(--gray-200); border-radius:16px; box-shadow:0 1px 3px rgba(0,0,0,0.1); transition:all 0.2s ease;} 
+        .card:hover{box-shadow:0 4px 12px rgba(0,0,0,0.15); transform:translateY(-1px);}
+        .card-title{color:var(--black); font-weight:600; font-size:1.1rem;} 
+        h1,h2,h3,h4,h5,h6{ color:var(--black); font-weight:600; }
+        p, li, small, label, .form-text{ color:var(--gray-700); }
+        .text-muted{color:var(--gray-500) !important;} 
+        .btn-primary{background:var(--teal-600); border-color:var(--teal-600); color:white; font-weight:500; border-radius:8px; padding:0.5rem 1rem;} 
+        .btn-primary:hover{background:var(--teal-700); border-color:var(--teal-700); transform:translateY(-1px); box-shadow:0 4px 12px rgba(20,184,166,0.3);} 
+        .btn-success{background:var(--lavender-600); border-color:var(--lavender-600); color:white; font-weight:500; border-radius:8px; padding:0.5rem 1rem;} 
+        .btn-success:hover{background:var(--lavender-700); border-color:var(--lavender-700); transform:translateY(-1px); box-shadow:0 4px 12px rgba(168,85,247,0.3);} 
+        .btn-outline-secondary{color:var(--gray-600); border-color:var(--gray-300); background:white; font-weight:500; border-radius:8px;} 
+        .btn-outline-secondary:hover{background:var(--gray-50); border-color:var(--gray-400); color:var(--gray-700);}
+        .btn-outline-danger{color:#dc2626; border-color:#fca5a5; background:white; font-weight:500; border-radius:8px;}
+        .btn-outline-danger:hover{background:#fef2f2; border-color:#f87171; color:#b91c1c;}
+        .btn-outline-primary{color:var(--teal-600); border-color:var(--teal-300); background:white; font-weight:500; border-radius:8px;}
+        .btn-outline-primary:hover{background:var(--teal-50); border-color:var(--teal-400); color:var(--teal-700);}
+        .badge-source{background:var(--teal-100); color:var(--teal-800); font-weight:500; border-radius:6px; padding:0.25rem 0.5rem;} 
+        .link-badge{max-width:100%; display:inline-block; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; background:var(--lavender-100) !important; color:var(--lavender-800) !important; border:1px solid var(--lavender-200) !important; border-radius:6px; padding:0.25rem 0.5rem;} 
+        .pill{border:1px solid var(--gray-300); color:var(--gray-600); background:var(--gray-100); padding:0.25rem 0.75rem; border-radius:999px; font-size:0.75rem; font-weight:500;} 
+        a{color:var(--teal-600); text-decoration:none;} 
+        a:hover{color:var(--teal-700); text-decoration:underline;} 
+        .form-control{font-size:0.95rem; color:var(--black); background:white; border:1px solid var(--gray-300); border-radius:8px; padding:0.5rem 0.75rem;} 
+        .form-control:focus{background:white; color:var(--black); border-color:var(--teal-400); box-shadow:0 0 0 3px rgba(20,184,166,0.1);}
+        .summary-list li{line-height:1.7; margin-bottom:0.5rem; color:var(--gray-700);} 
+        .alert-info{background:var(--teal-50); color:var(--teal-800); border:1px solid var(--teal-200); border-radius:12px;}
+        hr{border-color:var(--gray-200);}
+        /* Ensure notice subject is clearly visible */
+        .card-summary strong{ color:var(--black); font-weight:600; }
+        .card-summary .badge-source{ margin-right:8px; }
+        .badge{font-weight:500; border-radius:6px;}
+        .text-bg-info{background:var(--teal-100) !important; color:var(--teal-800) !important;}
+        .text-bg-warning{background:var(--lavender-100) !important; color:var(--lavender-800) !important;}
+        @media (max-width: 991px){ .card .text-end{ text-align:left !important; margin-top: .5rem;} }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg">
+        <div class="container py-2 d-flex justify-content-between align-items-center">
+            <span class="navbar-brand brand">College Notice Summarizer</span>
+            <a href="/?clear=1" class="btn btn-outline-danger btn-sm">Clear</a>
+        </div>
+    </nav>
+
+    <div class="container py-4">
+        <div class="row g-4">
+            <div class="col-lg-4">
+                <div class="card shadow-sm">
+                    <div class="card-body">
+                        <h5 class="card-title mb-3">Actions</h5>
+                        <form id="uploadForm" action="/upload" method="post" enctype="multipart/form-data" class="mb-3">
+                            <input type="file" name="file" class="form-control mb-2" accept=".pdf,.docx,.png,.jpg,.jpeg" required>
+                            <button type="submit" class="btn btn-primary w-100" data-loading-text="Uploading...">Upload & Summarize</button>
+                        </form>
+                        <form id="gmailForm" action="/fetch_gmail" method="post">
+                            <button type="submit" class="btn btn-success w-100" data-loading-text="Fetching...">📨 Fetch Notices from Gmail</button>
+                        </form>
+                        <div class="text-muted small mt-3">Gmail fetch requires configured Google credentials.</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-8">
+                <div class="d-flex align-items-center justify-content-between mb-2">
+                    <h5 class="mb-0">Summaries</h5>
+                    <span class="pill">Latest first</span>
+                </div>
+                {% if summaries %}
+                    <div class="vstack gap-3">
+                        {% for item in summaries %}
+                            <div class="card shadow-sm card-summary">
+                                <div class="card-body">
+                                    <div class="d-flex justify-content-between align-items-start">
+                                        <div>
+                                            <div class="d-flex align-items-center gap-2 flex-wrap">
+                                                <span class="badge badge-source">{{ item.source }}</span>
+                                                {% if item.subject %}
+                                                    <strong>{{ item.subject }}</strong>
+                                                {% endif %}
+                                            </div>
+                                            {% if item.raw_date %}
+                                                <div class="text-muted small mt-1">Email date: {{ item.raw_date }}</div>
+                                            {% endif %}
+                                        </div>
+                                        <div class="text-end d-flex flex-column align-items-end gap-1">
+                                            {% set ed = item.event_date if item.event_date is defined else None %}
+                                            {% set et = item.event_time if item.event_time is defined else None %}
+                                            {% if not ed and item.summary is defined and item.summary.date is defined %}
+                                                {% set ed = item.summary.date %}
+                                            {% endif %}
+                                            {% if not et and item.summary is defined and item.summary.time is defined %}
+                                                {% set et = item.summary.time %}
+                                            {% endif %}
+                                            {% if ed or et %}
+                                                <div class="d-flex flex-wrap gap-2">
+                                                    {% if ed %}
+                                                        <span class="badge text-bg-info">WHEN: {{ ed }}{% if et %} {{ et }}{% endif %}</span>
+                                                    {% endif %}
+                                                    {% if item.venue %}
+                                                        <span class="badge text-bg-warning">VENUE: {{ item.venue }}</span>
+                                                    {% endif %}
+                                                </div>
+                                            {% endif %}
+                                            {% if item.email_link %}
+                                                <a target="_blank" class="btn btn-sm btn-outline-secondary" href="{{ item.email_link }}">Open Email</a>
+                                            {% endif %}
+                                            {% if item.calendar_link %}
+                                                <a target="_blank" class="btn btn-sm btn-outline-primary" href="{{ item.calendar_link }}">Open in Calendar</a>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+
+                                    <hr>
+
+                                    {% if item.summary_lines is defined and item.summary_lines %}
+                                        <ul class="mb-2 summary-list">
+                                            {% for line in item.summary_lines %}
+                                                <li>{{ line }}</li>
+                                            {% endfor %}
+                                        </ul>
+                                    {% elif item.summary is defined and item.summary.summary is defined and item.summary.summary %}
+                                        <ul class="mb-2 summary-list">
+                                            {% for line in item.summary.summary %}
+                                                <li>{{ line }}</li>
+                                            {% endfor %}
+                                        </ul>
+                                    {% elif item.summary is defined and item.summary %}
+                                        <p class="mb-2">{{ item.summary }}</p>
+                                    {% else %}
+                                        <p class="mb-2 text-muted">No summary available.</p>
+                                    {% endif %}
+
+                                    {% set link_list = [] %}
+                                    {% if item.links is defined and item.links %}
+                                        {% set link_list = item.links %}
+                                    {% elif item.summary is defined and item.summary.links is defined and item.summary.links %}
+                                        {% set link_list = item.summary.links %}
+                                    {% endif %}
+
+                                    {% if link_list %}
+                                        <div class="mt-2">
+                                            <div class="text-muted small mb-1">Links</div>
+                                            <div class="d-flex flex-wrap gap-2">
+                                                {% for l in link_list %}
+                                                    <a class="badge link-badge border" target="_blank" href="{{ l }}">{{ l }}</a>
+                                                {% endfor %}
+                                            </div>
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <div class="alert alert-info">No summaries yet. Upload a file or fetch from Gmail.</div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function wireForm(formId){
+            const form = document.getElementById(formId);
+            if(!form) return;
+            form.addEventListener('submit', function(){
+                const btn = form.querySelector('button[type="submit"]');
+                if(btn){ btn.disabled = true; const txt = btn.getAttribute('data-loading-text') || 'Processing...'; btn.textContent = txt; }
+            }, { once: true });
+        }
+        wireForm('uploadForm');
+        wireForm('gmailForm');
+    </script>
+</body>
+</html>
