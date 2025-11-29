@@ -407,13 +407,7 @@ def summarize_text(text: str) -> Dict[str, Any]:
         except Exception:
             return ds
 
-    # Always show date/time if found
-    if date_str and time_str:
-        bullets.append(f"WHEN: {_fmt_date_human(date_str)} {time_str}.")
-    elif date_str:
-        bullets.append(f"WHEN: {_fmt_date_human(date_str)}.")
-    elif time_str:
-        bullets.append(f"WHEN: {time_str}.")
+    # Date/time information is now handled in the dashboard template
 
 
 

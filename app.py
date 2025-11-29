@@ -154,6 +154,10 @@ def save_summary_route():
 def fetch_gmail():
     try:
         notices = fetch_latest_notices()
+    except FileNotFoundError as e:
+        print(f"Gmail setup required: {e}")
+        # You could redirect to a setup page or show a message
+        return redirect(url_for("dashboard"))
     except Exception as e:
         print(f"Gmail fetch failed: {e}")
         return redirect(url_for("dashboard"))

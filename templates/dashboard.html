@@ -106,10 +106,10 @@
                                             {% if not et and item.summary is defined and item.summary.time is defined %}
                                                 {% set et = item.summary.time %}
                                             {% endif %}
-                                            {% if ed or et %}
+                                            {% if ed or et or item.venue %}
                                                 <div class="d-flex flex-wrap gap-2">
                                                     {% if ed %}
-                                                        <span class="badge text-bg-info">WHEN: {{ ed }}{% if et %} {{ et }}{% endif %}</span>
+                                                        <span class="badge text-bg-info">🕒 {{ ed }}{% if et %} {{ et }}{% endif %}</span>
                                                     {% endif %}
                                                     {% if item.venue %}
                                                         <span class="badge text-bg-warning">VENUE: {{ item.venue }}</span>
@@ -145,23 +145,6 @@
                                         <p class="mb-2 text-muted">No summary available.</p>
                                     {% endif %}
 
-                                    {% set link_list = [] %}
-                                    {% if item.links is defined and item.links %}
-                                        {% set link_list = item.links %}
-                                    {% elif item.summary is defined and item.summary.links is defined and item.summary.links %}
-                                        {% set link_list = item.summary.links %}
-                                    {% endif %}
-
-                                    {% if link_list %}
-                                        <div class="mt-2">
-                                            <div class="text-muted small mb-1">Links</div>
-                                            <div class="d-flex flex-wrap gap-2">
-                                                {% for l in link_list %}
-                                                    <a class="badge link-badge border" target="_blank" href="{{ l }}">{{ l }}</a>
-                                                {% endfor %}
-                                            </div>
-                                        </div>
-                                    {% endif %}
                                 </div>
                             </div>
                         {% endfor %}

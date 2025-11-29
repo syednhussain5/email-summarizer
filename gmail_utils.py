@@ -10,12 +10,31 @@ SCOPES = ["https://www.googleapis.com/auth/gmail.readonly",
           "https://www.googleapis.com/auth/calendar.events"]
 
 def get_gmail_service():
+    # Check if credentials.json exists
+    if not os.path.exists("credentials.json"):
+        raise FileNotFoundError(
+            "credentials.json not found. Please download it from Google Cloud Console:\n"
+            "1. Go to https://console.cloud.google.com/\n"
+            "2. Create/select a project\n"
+            "3. Enable Gmail API and Calendar API\n"
+            "4. Create OAuth 2.0 credentials (Desktop application)\n"
+            "5. Download and rename to 'credentials.json'"
+        )
+    
     creds = None
     if os.path.exists("token.json"):
         creds = Credentials.from_authorized_user_file("token.json", SCOPES)
     if not creds or not creds.valid:
         if creds and creds.expired and creds.refresh_token:
-            creds.refresh(Request())
+            try:
+                creds.refresh(Request())
+            except Exception as e:
+                print(f"Token refresh failed: {e}")
+                # Delete invalid token and re-authenticate
+                if os.path.exists("token.json"):
+                    os.remove("token.json")
+                flow = InstalledAppFlow.from_client_secrets_file("credentials.json", SCOPES)
+                creds = flow.run_local_server(port=0)
         else:
             flow = InstalledAppFlow.from_client_secrets_file("credentials.json", SCOPES)
             creds = flow.run_local_server(port=0)
@@ -23,13 +42,46 @@ def get_gmail_service():
             token.write(creds.to_json())
     return build("gmail", "v1", credentials=creds)
 
-def fetch_emails(service, max_results=5):
+def fetch_emails(service, max_results=10):
+    # More comprehensive search query for college notices
+    search_query = (
+        "subject:(Notice OR Circular OR Exam OR Enroll OR Registration OR "
+        "Admission OR Result OR Schedule OR Timetable OR Assignment OR "
+        "Project OR Seminar OR Workshop OR Conference OR Meeting OR "
+        "Deadline OR Due OR Important OR Urgent OR Update OR Announcement) "
+        "OR from:(noreply OR admin OR registrar OR principal OR dean OR "
+        "academic OR examination OR admission) "
+        "newer_than:7d"  # Only emails from last 7 days
+    )
+    
     results = service.users().messages().list(
         userId="me",
-        q="subject:Notice OR subject:Circular OR subject:Exam OR subject:Enroll",
+        q=search_query,
         maxResults=max_results
     ).execute()
-    return results.get("messages", [])
+    
+    messages = results.get("messages", [])
+    
+    # If no recent emails found, try a broader search without date restriction
+    if not messages:
+        print("No recent emails found, searching for any college-related emails...")
+        broader_query = (
+            "subject:(Notice OR Circular OR Exam OR Enroll OR Registration OR "
+            "Admission OR Result OR Schedule OR Timetable OR Assignment OR "
+            "Project OR Seminar OR Workshop OR Conference OR Meeting OR "
+            "Deadline OR Due OR Important OR Urgent OR Update OR Announcement) "
+            "OR from:(noreply OR admin OR registrar OR principal OR dean OR "
+            "academic OR examination OR admission)"
+        )
+        
+        results = service.users().messages().list(
+            userId="me",
+            q=broader_query,
+            maxResults=max_results
+        ).execute()
+        messages = results.get("messages", [])
+    
+    return messages
 
 def _html_to_text(html_str: str) -> str:
     soup = BeautifulSoup(html_str, "html.parser")
@@ -128,10 +180,13 @@ def fetch_latest_notices(service=None, max_results=5):
         service = get_gmail_service()
     notices = []
     messages = fetch_emails(service, max_results=max_results)
+    
+    print(f"Found {len(messages)} emails matching search criteria")
 
     for msg in messages:
         subject, date, content = get_email_content(service, msg["id"])
         web_link = f"https://mail.google.com/mail/u/0/#inbox/{msg['id']}"
+        print(f"Processing email: {subject} ({date})")
         notices.append({
             "id": msg["id"],
             "subject": subject,
